@@ -1,0 +1,9 @@
+Simplec makes your libvirt managed VMs available via local DNS. It writes a
+hosts file that can then be parsed by dnsmasq (a lightweight DHCP and caching
+DNS server) so that you can query name and addresses of your VMs easily.
+
+It also prints the vm names and IPs to stdout for easy c'n'p.
+
+To build and run do a:
+
+    make && make && ./simplec

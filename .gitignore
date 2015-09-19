@@ -1,0 +1,7 @@
+.rebar/
+.depsolver_plt
+deps/
+ebin/
+*~
+priv/*.hosts
+erl_crash.dump

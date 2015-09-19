@@ -1,0 +1,1 @@
+-record(config, {url, dir}).
