@@ -35,8 +35,9 @@
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link(Args) ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, Args, []).
+start_link(Args = {url, Url}) ->
+    Name = list_to_atom(lists:flatten(io_lib:format("~p_~s", [?SERVER, Url] ))),
+    gen_server:start_link({local, Name}, ?MODULE, Args, []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -53,8 +54,7 @@ start_link(Args) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(Config) ->
-    Url = Config#config.url,
+init({url, Url}) ->
     io:format("Monitoring ~s~n~n", [Url]),
     {ok, Ref} = verx_client:start(),
     {ok, [1]} = verx:auth_polkit(Ref),
@@ -104,11 +104,11 @@ handle_cast(Msg, State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_info(timeout, State) ->
+handle_info(timeout, State = #state{url=Url}) ->
     {ok, Res} = get_addresses(State#state.verxref),
     case Res == State#state.cur of
 	false -> print_addresses(Res),
-		 simplec_hostsfile:write(Res);
+		 simplec_hostsfile:write(Res, Url);
 	true -> true
     end,
     {noreply, State#state{cur=Res}, ?QUERY_INTERVAL};

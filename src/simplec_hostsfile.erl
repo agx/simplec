@@ -14,7 +14,7 @@
 
 %% API
 -export([start_link/1,
-	 write/1]).
+	 write/2]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -44,8 +44,8 @@ start_link(Config) ->
 %% Writes out the hosts
 %% @end
 %%--------------------------------------------------------------------
-write(Hosts) ->
-    gen_server:cast(simplec_hostsfile, {hosts, Hosts}).
+write(Hosts, Url) ->
+    gen_server:cast(simplec_hostsfile, [{hosts, Hosts}, {url, Url}]).
 
 
 %%%===================================================================
@@ -63,10 +63,10 @@ write(Hosts) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(Config) ->
+init(Config=#config{uris=Uris}) ->
     State = #state{config=Config},
-    % Make sure the file exists
-    write_hostsfile(State, {hosts, []}),
+    % Make sure the file exists and has no stale state
+    [ write_hostsfile([{hosts, []}, {url, U}], State) || U <- Uris ],
     {ok, State}.
 
 %%--------------------------------------------------------------------
@@ -97,8 +97,8 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast({hosts, Hosts}, State) ->
-    write_hostsfile(State, {hosts, Hosts}),
+handle_cast(Args, State) ->
+    write_hostsfile(Args, State),
     {noreply, State}.
 
 
@@ -155,9 +155,9 @@ write_line(Host, [H|T], Aggr) ->
     write_line(Host, T, [io_lib:format("~s ~s~n",[H,Host])|Aggr]).
 
 
-write_hostsfile(#state{config=Config}, {hosts, Hosts}) ->
+write_hostsfile([{hosts, Hosts}, {url, Url}], #state{config=Config}) ->
     File = filename:join(Config#config.dir, 
-			 "libvirt-" ++ http_uri:encode(Config#config.url) ++ ".hosts"),
+			 "libvirt-" ++ http_uri:encode(Url) ++ ".hosts"),
     TmpFile = File ++ [".tmp"],
     Data = [ write_line(Host, Addrs) || {Host, Addrs} <- Hosts ],
     file:write_file(TmpFile, Data),

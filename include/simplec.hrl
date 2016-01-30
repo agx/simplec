@@ -1,1 +1,1 @@
--record(config, {url, dir}).
+-record(config, {uris, dir}).

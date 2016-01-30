@@ -12,9 +12,9 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    {ok, Uri} = application:get_env(simplec, uri),
+    {ok, Uris} = application:get_env(simplec, uris),
     {ok, Dir} = application:get_env(simplec, dir),
-    C = #config{url=Uri, dir=Dir},
+    C = #config{uris=Uris, dir=Dir},
     simplec_sup:start_link(C).
 
 stop(_State) ->

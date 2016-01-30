@@ -10,7 +10,8 @@
                   stdlib
                  ]},
   {mod, { simplec_app, []}},
-  {env, [{uri, "qemu:///system"},
+  {env, [{uris, ["qemu:///system",
+                 "lxc:///"]},
          {dir, "priv"}
         ]}
  ]}.

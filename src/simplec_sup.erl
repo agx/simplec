@@ -10,6 +10,8 @@
 
 -behaviour(supervisor).
 
+-include("simplec.hrl").
+
 %% API
 -export([start_link/1]).
 
@@ -58,8 +60,14 @@ init(Config) ->
     MaxSecondsBetweenRestarts = 3600,
 
     SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
-    Childs = [?CHILD_WITH_ARGS(simplec_vms, worker, Config),
-	      ?CHILD_WITH_ARGS(simplec_hostsfile, worker, Config)],
+
+    VmChilds = [{list_to_atom(Url),
+		 {simplec_vms, start_link, [{url, Url}]},
+		 permanent,
+		 5000,
+		 worker,
+		 [simplec_vms]} || Url <- Config#config.uris],
+    Childs = VmChilds ++ [?CHILD_WITH_ARGS(simplec_hostsfile, worker, Config)],
     {ok, {SupFlags, Childs}}.
 
 %%%===================================================================
