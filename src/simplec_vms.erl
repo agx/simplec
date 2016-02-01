@@ -156,8 +156,10 @@ filter_addresses(Addrs) ->
 
 
 addresses(Ref, Domain) ->
-    {ok, [Addrs]} = verx:domain_interface_addresses(Ref, [Domain, 0, 0]),
-    Addrs.
+    case verx:domain_interface_addresses(Ref, [Domain, 0, 0]) of
+	{ok, [Addrs]} -> Addrs;
+	{error, _Error} -> []
+    end.
 
 
 domains(Ref, IDs) ->
