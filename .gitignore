@@ -1,3 +1,4 @@
+.eunit/
 .rebar/
 .depsolver_plt
 deps/
