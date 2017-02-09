@@ -7,3 +7,11 @@ It also prints the vm names and IPs to stdout for easy c'n'p.
 To build and run do a:
 
     make && make && ./simplec
+
+If you want to install it as a systemd user service for the current user use:
+
+	make install_user
+
+and to get rid of it again use:
+
+	make uninstall_user

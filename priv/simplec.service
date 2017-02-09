@@ -1,0 +1,10 @@
+[Unit]
+Description=Simplec: simple vm interface
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "exec ${HOME}/bin/simplec"
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -1,3 +1,9 @@
 #!/bin/sh
-`dirname $0`
-exec erl -pa $PWD/ebin $PWD/deps/*/ebin -boot start_sasl -s simplec
+BIN=$(realpath $0)
+cd $(dirname $BIN)
+
+if [ ! -t 1 ]; then
+    ARGS=-noinput
+fi
+
+exec erl $ARGS -pa $PWD/ebin $PWD/deps/*/ebin -boot start_sasl -s simplec

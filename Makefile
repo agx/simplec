@@ -1,5 +1,7 @@
 ERL ?= erl
 APP := simplec
+USER_UNITS := ~/.config/systemd/user/
+SERVICE := $(APP).service
 
 .PHONY: deps
 
@@ -25,6 +27,17 @@ test: all
 
 tags:
 	find . -name "*.[he]rl" -print | etags -
+
+install_user: test
+	cp priv/$(SERVICE) $(USER_UNITS)/$(SERVICE)
+	mkdir -p ~/bin/
+	ln -s $$(realpath .)/$(APP) ~/bin/$(APP)
+	systemctl --user enable $(SERVICE)
+
+uninstall_user:
+	systemctl --user stop $(SERVICE)
+	systemctl --user disable $(SERVICE)
+	rm -f $(USER_UNITS)/$(SERVICE) ~/bin/$(APP)
 
 DEPSOLVER_PLT=$(CURDIR)/.depsolver_plt
 $(DEPSOLVER_PLT):
